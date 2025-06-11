@@ -23,6 +23,9 @@ app.use((err, req, res, next) => {
 
 });
 
+app.use(express.json());       // to support JSON-encoded bodies
+app.use(express.urlencoded()); // to support URL-encoded bodies
+
 app.get('/', (req, res) => {
 
     // console.log(new Date().toUTCString());
@@ -36,29 +39,41 @@ app.get('/users', (req, res) => {
 
 });
 
+app.get('/users/:id', (req, res) => {
+    const user = users.find((u) => u.id == req.params.id);
+    res.json(user);
+
+});
+
 app.post('/users/create', (req, res, next) => {
 
-    if (req.body.username && req.body.email) {
+    console.log(req.body);
+    if (req.body) {
+        if (req.body.username && req.body.email) {
 
-        if (users.find((u) => u.username == req.body.username)) {
-            next(new Error("Username Already Taken!"));
+            if (users.find((u) => u.username == req.body.username)) {
+                next(new Error("Username Already Taken!"));
+            }
+            if (users.find((u) => u.email == req.body.email)) {
+                next(new Error("Email Already In Use!"));
+            }
+
+            const user = {
+                id: users[users.length - 1].id + 1,
+                username: req.body.username,
+                email: req.body.email
+            };
+
+            users.push(user);
+            res.json(user);
+
+        } else {
+            next(new Error("Please fill out all required fields."));
         }
-        if (users.find((u) => u.email == req.body.email)) {
-            next(new Error("Email Already In Use!"));
-        }
-
-        const user = {
-            id: users[users.length - 1].id + 1,
-            username: req.body.username,
-            email: req.body.email
-        };
-
-        users.push(user);
-        res.json(user);
-        
     } else {
-        next(new Error("Please fill out all required fields."));
+        next(new Error("Request body cannot be read."));
     }
+
 });
 
 app.get('/posts', (req, res) => {
