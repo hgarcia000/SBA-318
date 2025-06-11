@@ -17,11 +17,6 @@ const logReq = (req, res, next) => {
 
 app.use(logReq);
 
-app.use((err, req, res, next) => {
-
-    res.status(400).send(err.message);
-
-});
 
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
@@ -54,18 +49,20 @@ app.post('/users/create', (req, res, next) => {
             if (users.find((u) => u.username == req.body.username)) {
                 next(new Error("Username Already Taken!"));
             }
-            if (users.find((u) => u.email == req.body.email)) {
+            else if (users.find((u) => u.email == req.body.email)) {
                 next(new Error("Email Already In Use!"));
+            } else {
+
+                const user = {
+                    id: users[users.length - 1].id + 1,
+                    username: req.body.username,
+                    email: req.body.email
+                };
+    
+                users.push(user);
+                res.json(user);
+
             }
-
-            const user = {
-                id: users[users.length - 1].id + 1,
-                username: req.body.username,
-                email: req.body.email
-            };
-
-            users.push(user);
-            res.json(user);
 
         } else {
             next(new Error("Please fill out all required fields."));
@@ -178,14 +175,79 @@ app.delete('/posts/delete/:id', (req, res, next) => {
 
 app.get('/scores', (req, res) => {
 
-    scores.sort((a, b) => {return b.score - a.score});
+    if (req.query.sort == 'desc') {
+
+        scores.sort((a, b) => {return b.score - a.score});
+
+    } else if (req.query.sort == 'asc') {
+    
+        scores.sort((a, b) => {return a.score - b.score});
+    
+    } else {
+
+        scores.sort((a, b) => {return a.id - b.id});
+
+    }
 
     res.json(scores);
     
 });
 
-app.get('/scores/:userId', (req, res) => {});
+app.get('/scores/:userId', (req, res) => {
 
+    const score = scores.find((s) => s.userId == req.params.userId);
+
+    res.json(score);
+
+});
+
+app.post('/scores/add/:userId', (req, res, next) => {
+
+    if (scores.find((s) => s.userId == req.params.userId)) {
+
+        next(new Error("This user already has a score!"));
+
+    }
+
+    const score = {
+
+        id: scores.length + 1,
+        userId: Number(req.params.userId),
+        score: Number(req.body.score)
+
+    };
+
+    console.log(typeof score.score == NaN);
+    if (typeof score.score == NaN) {
+
+        next(new Error("Score is not a number!"));
+
+    }
+
+    scores.push(score);
+    res.json(score);
+});
+
+app.put('/scores/update/:userId', (req, res, next) => {
+
+    const score = scores.find((s) => s.userId == req.params.userId);
+    if (score) {
+        
+        score.score = Number(req.body.score);
+        res.json(score);
+
+    } else {
+        next(new Error("Please fill out your new score!"));
+    }
+});
+
+// Error-handling Middleware
+app.use((err, req, res, next) => {
+
+    res.status(400);
+    res.json({error: err.message});
+
+});
 
 app.listen(port, () => {
     console.log(`Server listening on port ${port}.`)
