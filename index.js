@@ -76,9 +76,83 @@ app.post('/users/create', (req, res, next) => {
 
 });
 
-app.get('/posts', (req, res) => {
+app.get('/posts', (req, res, next) => {
 
-    res.json(posts);
+    console.log(Number(req.query.limit));
+
+    if (req.query.limit) {
+
+        const limit = Number(req.query.limit);
+
+        if (limit instanceof Number) {
+
+            if (limit < posts.length) {
+                
+                const postList = [];
+    
+                for (let i = 0; i < limit; i++) {
+    
+                    postList.push(posts[i]);
+                    
+                }
+    
+                res.json(postList);
+    
+            } else {
+    
+                res.json(posts);
+    
+            }
+            
+        } else {
+
+            next(new Error("Limit query parameter is not a number!"));
+            
+        }
+
+    } else {
+
+        res.json(posts);
+
+    }
+
+});
+
+app.get('/posts/:userId', (req, res, next) => {
+
+    const postList = posts.filter((p) => {return p.userId == req.params.userId});
+
+    res.json(postList);
+});
+
+app.post('/posts/:userId/add', (req, res, next) => {
+
+    console.log(req.body);
+
+    if (!posts.find((p) => p.userId == req.params.userId)) {
+
+        next(new Error("User ID does not exist!"));
+
+    } 
+
+    if (req.body.title && req.body.content) {
+        
+        const post = {
+            id: posts[posts.length - 1].id + 1,
+            userId: Number(req.params.userId),
+            title: req.body.title,
+            content: req.body.content,
+            date: new Date().toUTCString()
+        };
+
+        posts.push(post);
+        res.json(post);
+
+    } else {
+
+        next(new Error("Please fill out all required fields."));
+
+    }
 
 });
 
@@ -91,4 +165,5 @@ app.get('/scores', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server listening on port ${port}.`)
+    console.log(Number("tr") instanceof Number)
 });
