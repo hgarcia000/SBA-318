@@ -31,9 +31,34 @@ app.get('/', (req, res) => {
 });
 
 app.get('/users', (req, res) => {
-    // f
+    
     res.json(users);
 
+});
+
+app.post('/users/create', (req, res, next) => {
+
+    if (req.body.username && req.body.email) {
+
+        if (users.find((u) => u.username == req.body.username)) {
+            next(new Error("Username Already Taken!"));
+        }
+        if (users.find((u) => u.email == req.body.email)) {
+            next(new Error("Email Already In Use!"));
+        }
+
+        const user = {
+            id: users[users.length - 1].id + 1,
+            username: req.body.username,
+            email: req.body.email
+        };
+
+        users.push(user);
+        res.json(user);
+        
+    } else {
+        next(new Error("Please fill out all required fields."));
+    }
 });
 
 app.get('/posts', (req, res) => {
