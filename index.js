@@ -78,13 +78,13 @@ app.post('/users/create', (req, res, next) => {
 
 app.get('/posts', (req, res, next) => {
 
-    console.log(Number(req.query.limit));
+    // console.log(Number(req.query.limit));
 
     if (req.query.limit) {
 
         const limit = Number(req.query.limit);
 
-        if (limit instanceof Number) {
+        if (typeof limit === 'number') {
 
             if (limit < posts.length) {
                 
@@ -107,7 +107,7 @@ app.get('/posts', (req, res, next) => {
         } else {
 
             next(new Error("Limit query parameter is not a number!"));
-            
+
         }
 
     } else {
@@ -125,7 +125,7 @@ app.get('/posts/:userId', (req, res, next) => {
     res.json(postList);
 });
 
-app.post('/posts/:userId/add', (req, res, next) => {
+app.post('/posts/add/:userId', (req, res, next) => {
 
     console.log(req.body);
 
@@ -156,14 +156,37 @@ app.post('/posts/:userId/add', (req, res, next) => {
 
 });
 
+app.delete('/posts/delete/:id', (req, res, next) => {
+
+    const post = posts.find((p, i) => {
+        if (p.id == req.params.id) {
+
+            posts.splice(i, 1);
+            return true;
+        }
+    });
+
+    if (post) {
+
+        res.json(post);
+        
+    } else {
+
+        next(new Error("Post ID does not exist!"));
+    }
+});
+
 app.get('/scores', (req, res) => {
+
+    scores.sort((a, b) => {return b.score - a.score});
 
     res.json(scores);
     
 });
 
+app.get('/scores/:userId', (req, res) => {});
+
 
 app.listen(port, () => {
     console.log(`Server listening on port ${port}.`)
-    console.log(Number("tr") instanceof Number)
 });
