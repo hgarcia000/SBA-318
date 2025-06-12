@@ -21,23 +21,30 @@ app.use(logReq);
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
 
+app.set("view engine", "ejs");
+
 app.get('/', (req, res) => {
 
     // console.log(new Date().toUTCString());
 
     const links = [
         {
-            href: "users",
+            href: "/renderscores",
+            rel: "renderscores",
+            type: "GET",
+        },
+        {
+            href: "/users",
             rel: "users",
             type: "GET",
         },
         {
-            href: "posts",
+            href: "/posts",
             rel: "posts",
             type: "GET",
         },
         {
-            href: "scores",
+            href: "/scores",
             rel: "scores",
             type: "GET",
         }
@@ -45,6 +52,11 @@ app.get('/', (req, res) => {
 
     res.json({links});
 
+});
+
+app.get('/renderscores', (req, res) => {
+    scores.sort((a, b) => {return b.score - a.score});
+    res.render("index", {scores: scores});
 });
 
 app.get('/users', (req, res) => {
