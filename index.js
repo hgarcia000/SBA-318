@@ -17,6 +17,8 @@ const logReq = (req, res, next) => {
 
 app.use(logReq);
 
+app.use(express.static('./styles'));
+
 
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
