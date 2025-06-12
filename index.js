@@ -317,6 +317,11 @@ app.post('/scores/add/:userId', (req, res, next) => {
 
     };
 
+    if (typeof score.userId == NaN) {
+
+        next(new Error("User ID is not a number!"));
+
+    }
     console.log(typeof score.score == NaN);
     if (typeof score.score == NaN) {
 
