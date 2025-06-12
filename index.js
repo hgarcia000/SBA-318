@@ -24,13 +24,45 @@ app.use(express.urlencoded()); // to support URL-encoded bodies
 app.get('/', (req, res) => {
 
     // console.log(new Date().toUTCString());
-    res.send(`<h1>Home Page</h1>`);
+
+    const links = [
+        {
+            href: "users",
+            rel: "users",
+            type: "GET",
+        },
+        {
+            href: "posts",
+            rel: "posts",
+            type: "GET",
+        },
+        {
+            href: "scores",
+            rel: "scores",
+            type: "GET",
+        }
+    ];
+
+    res.json({links});
 
 });
 
 app.get('/users', (req, res) => {
     
-    res.json(users);
+    const links = [
+        {
+            href: "users/:id",
+            rel: ":id",
+            type: "GET",
+        },
+        {
+            href: "users/create",
+            rel: "create",
+            type: "POST",
+        }
+    ];
+
+    res.json({users, links});
 
 });
 
@@ -76,6 +108,28 @@ app.post('/users/create', (req, res, next) => {
 app.get('/posts', (req, res, next) => {
 
     // console.log(Number(req.query.limit));
+    const links = [
+        {
+            href: `posts?limit=${req.query.limit}`,
+            rel: `?limit${req.query.limit}`,
+            type: "GET",
+        },
+        {
+            href: "posts/:userId",
+            rel: ":userId",
+            type: "GET",
+        },
+        {
+            href: "posts/add/:userId",
+            rel: "add/:userId",
+            type: "POST",
+        },
+        {
+            href: "posts/delete/:id",
+            rel: "delete/:id",
+            type: "DELETE",
+        }
+    ];
 
     if (req.query.limit) {
 
@@ -93,11 +147,12 @@ app.get('/posts', (req, res, next) => {
                     
                 }
     
-                res.json(postList);
+                res.json({postList, links});
     
             } else {
     
-                res.json(posts);
+                const postList = posts
+                res.json({postList, links});
     
             }
             
@@ -109,7 +164,8 @@ app.get('/posts', (req, res, next) => {
 
     } else {
 
-        res.json(posts);
+        const postList = posts;
+        res.json({postList, links});
 
     }
 
@@ -175,6 +231,34 @@ app.delete('/posts/delete/:id', (req, res, next) => {
 
 app.get('/scores', (req, res) => {
 
+    const links = [
+        {
+            href: `scores?sort=${req.query.sort}`,
+            rel: `?limit${req.query.sort}`,
+            type: "GET",
+        },
+        {
+            href: "scores/:userId",
+            rel: ":userId",
+            type: "GET",
+        },
+        {
+            href: "scores/add/:userId",
+            rel: "add/:userId",
+            type: "POST",
+        },
+        {
+            href: "scores/update/:userId",
+            rel: "update/:userId",
+            type: "PUT",
+        },
+        {
+            href: "scores/delete/:id",
+            rel: "delete/:id",
+            type: "DELETE",
+        }
+    ];
+
     if (req.query.sort == 'desc') {
 
         scores.sort((a, b) => {return b.score - a.score});
@@ -189,7 +273,7 @@ app.get('/scores', (req, res) => {
 
     }
 
-    res.json(scores);
+    res.json({scores, links});
     
 });
 
