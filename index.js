@@ -209,9 +209,11 @@ app.post('/scores/add/:userId', (req, res, next) => {
 
     }
 
+    scores.sort((a, b) => {return a.id - b.id});
+
     const score = {
 
-        id: scores.length + 1,
+        id: scores[scores.length - 1].id + 1,
         userId: Number(req.params.userId),
         score: Number(req.body.score)
 
@@ -238,6 +240,25 @@ app.put('/scores/update/:userId', (req, res, next) => {
 
     } else {
         next(new Error("Please fill out your new score!"));
+    }
+});
+
+app.delete('scores/delete/:id', (req, res, next) => {
+    const score = scores.find((s, i) => {
+        if (s.id == req.params.id) {
+
+            scores.splice(i, 1);
+            return true;
+        }
+    });
+
+    if (score) {
+
+        res.json(score);
+        
+    } else {
+
+        next(new Error("Score ID does not exist!"));
     }
 });
 
