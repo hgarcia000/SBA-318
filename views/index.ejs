@@ -20,5 +20,20 @@
             </tr>
         <% }) %>
     </table>
+
+    <form action="/scores/add/:userId" method="POST">
+        <div>
+            <label for="userId">User ID:</label>
+            <input name="userId" id="userId" value="" />
+        </div>
+        <div>
+            <label for="score">Score: </label>
+            <input name="score" id="score" value="" />
+        </div>
+        <div>
+            <button >Submit Score</button>
+        </div>
+    </form>
+
 </body>
 </html>

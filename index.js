@@ -240,6 +240,7 @@ app.delete('/posts/delete/:id', (req, res, next) => {
     } else {
 
         next(new Error("Post ID does not exist!"));
+
     }
 });
 
@@ -301,6 +302,10 @@ app.get('/scores/:userId', (req, res) => {
 
 app.post('/scores/add/:userId', (req, res, next) => {
 
+    if (req.params.userId == ":userId") {
+        req.params.userId = req.body.userId;
+    }
+
     if (scores.find((s) => s.userId == req.params.userId)) {
 
         next(new Error("This user already has a score!"));
@@ -342,7 +347,9 @@ app.put('/scores/update/:userId', (req, res, next) => {
         res.json(score);
 
     } else {
+
         next(new Error("Please fill out your new score!"));
+
     }
 });
 
@@ -352,6 +359,7 @@ app.delete('scores/delete/:id', (req, res, next) => {
 
             scores.splice(i, 1);
             return true;
+            
         }
     });
 
