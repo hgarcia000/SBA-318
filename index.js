@@ -26,6 +26,7 @@ app.use(express.static('./styles'));
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
 
+// Setting the template engine
 app.set("view engine", "ejs");
 
 app.get('/', (req, res) => {
@@ -58,6 +59,7 @@ app.get('/', (req, res) => {
 
 });
 
+// Rendering the view with our template engine.
 app.get('/renderscores', (req, res) => {
     if (req.query.sort == 'desc') {
 
